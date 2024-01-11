@@ -41,7 +41,7 @@ def main():
         width=400,
         height=200,
         drawing_mode="freedraw",
-        stroke_color="white",
+        background_color="white",
         stroke_width=2,
         display_toolbar=True
     )
