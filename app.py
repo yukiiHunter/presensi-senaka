@@ -3,6 +3,7 @@ from streamlit_drawable_canvas import st_canvas
 from supabase import Client
 import io
 from PIL import Image
+from datetime import datetime
 import requests
 from geopy.distance import geodesic
 from streamlit_geolocation import streamlit_geolocation
@@ -15,12 +16,20 @@ supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # Connect to Supabase
 client = Client(supabase_url, supabase_key)
 
+
 def main():
     st.title("Form Presensi")
 
     nama = st.text_input("Nama")
     kelas = st.text_input("Kelas")
-    tanggal_presensi = st.date_input("Tanggal Presensi")
+    
+    # Validating input
+    if not nama or not kelas:
+        st.warning("Nama dan kelas harus diisi.")
+        return
+    
+    tanggal_presensi = datetime.today().date()
+    st.write(f"Tanggal Presensi: {tanggal_presensi.strftime('%Y-%m-%d')}")
 
     st.write("Tanda Tangan:")
     signature = st_canvas(
@@ -41,11 +50,10 @@ def main():
         st.warning("User location not available.")
 
     # Check if the user is within a specified distance from the reference location
-    allowed_distance = 50.0
+    allowed_distance = 100.0
 
     if st.button("Submit"):
         if is_within_distance(location, allowed_distance):
-            st.success("Presensi berhasil di-submit!")
 
             # Convert canvas result to image
             signature_image = Image.fromarray(signature.image_data.astype('uint8'))
@@ -66,7 +74,7 @@ def main():
 
             # Check if the upload was successful
             if response.status_code == 200:
-                st.write("Image uploaded successfully!")
+                st.success("Presensi berhasil di-submit!")
                 storage_url = f"{supabase_url}/storage/v1/object/public/{filename}"
 
                 # Prepare data for insertion
@@ -77,6 +85,7 @@ def main():
                     'foto': storage_url,
                 }
 
+               
                 # Check if the record already exists
                 response = client.table('presensi').select().eq('nama', nama).execute()
                 existing_record = response.data if hasattr(response, 'data') else []
@@ -88,6 +97,7 @@ def main():
                     # Insert new record
                     presensi_response, presensi_error = client.table('presensi').insert([presensi_data]).execute()
 
+
                 # Display input details and signature image
                 st.write("### Input Details:")
                 st.write(f"Nama: {nama}")
@@ -98,7 +108,7 @@ def main():
                 st.image(signature_bytes, caption='Tanda Tangan', use_column_width=True)
 
             else:
-                st.error(f"Failed to upload image. Status code: {response.status_code}")
+                st.error(f"Kamu sudah presensi hari ini")
         else:
             st.error("Presensi gagal di-submit. Anda berada di lokasi yang tidak diizinkan.")
 
@@ -108,7 +118,7 @@ def is_within_distance(user_location, allowed_distance):
         user_point = (user_location['latitude'], user_location['longitude'])
         
         # Specify the reference location (latitude, longitude)
-        reference_location = (-6.9913367,110.4216002)
+        reference_location = (-6.9858542, 110.4150302)
 
         # Calculate the distance between user's location and the reference location
         distance = geodesic(reference_location, user_point).miles
