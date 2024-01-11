@@ -41,7 +41,7 @@ def main():
         st.warning("User location not available.")
 
     # Check if the user is within a specified distance from the reference location
-    allowed_distance = 100.0
+    allowed_distance = 50.0
 
     if st.button("Submit"):
         if is_within_distance(location, allowed_distance):
@@ -108,7 +108,7 @@ def is_within_distance(user_location, allowed_distance):
         user_point = (user_location['latitude'], user_location['longitude'])
         
         # Specify the reference location (latitude, longitude)
-        reference_location = (-6.9858542, 110.4150302)
+        reference_location = (-6.9913367,110.4216002)
 
         # Calculate the distance between user's location and the reference location
         distance = geodesic(reference_location, user_point).miles
