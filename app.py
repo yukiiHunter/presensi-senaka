@@ -166,13 +166,14 @@ def admin():
 
             # Input untuk pencarian dan filter
             search_query = st.text_input("Cari Nama atau Kelas:")
-            # Fetch the oldest and newest dates from the database
+            # Fetch the oldest date from the database
             response = client.table('presensi').select('tanggal').order('tanggal', ascending=True).limit(1).execute()
             oldest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
             
+            # Fetch the newest date from the database
             response = client.table('presensi').select('tanggal').order('tanggal', ascending=False).limit(1).execute()
             newest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
-            
+
             # Set the default date within the allowed range
             default_date = min(max(oldest_date, datetime.date.today()), newest_date)
             
