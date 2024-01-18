@@ -166,10 +166,18 @@ def admin():
 
             # Input untuk pencarian dan filter
             search_query = st.text_input("Cari Nama atau Kelas:")
-            min_date = df_presensi['tanggal'].min()
-            max_date = df_presensi['tanggal'].max()
-            selected_date = st.date_input("Pilih Tanggal", min_value=min_date, max_value=max_date, key="date_filter")
-            st.write(f"min_date: {min_date}, max_date: {max_date}")
+            # Fetch the oldest and newest dates from the database
+            response = client.table('presensi').select('tanggal').order('tanggal', ascending=True).limit(1).execute()
+            oldest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
+            
+            response = client.table('presensi').select('tanggal').order('tanggal', ascending=False).limit(1).execute()
+            newest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
+            
+            # Set the default date within the allowed range
+            default_date = min(max(oldest_date, datetime.date.today()), newest_date)
+            
+            # Use st.date_input with the updated default_date
+            selected_date = st.date_input("Pilih Tanggal", min_value=oldest_date, max_value=newest_date, value=default_date, key="date_filter")
 
             # Filter DataFrame berdasarkan pencarian dan tanggal
             filtered_df = df_presensi
