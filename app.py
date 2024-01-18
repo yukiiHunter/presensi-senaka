@@ -168,11 +168,13 @@ def admin():
             search_query = st.text_input("Cari Nama atau Kelas:")
             # Fetch the oldest date from the database
             response = client.table('presensi').select('tanggal').order('tanggal').limit(1).execute()
-            oldest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
+            oldest_date_str = response.data[0]['tanggal'] if response.data else datetime.date.today().isoformat()
+            oldest_date = datetime.datetime.fromisoformat(oldest_date_str).date()
             
             # Fetch the newest date from the database
             response = client.table('presensi').select('tanggal').order('tanggal', ascending=False).limit(1).execute()
-            newest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
+            newest_date_str = response.data[0]['tanggal'] if response.data else datetime.date.today().isoformat()
+            newest_date = datetime.datetime.fromisoformat(newest_date_str).date()
 
             # Set the default date within the allowed range
             default_date = min(max(oldest_date, datetime.date.today()), newest_date)
