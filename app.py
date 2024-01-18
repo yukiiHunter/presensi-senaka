@@ -169,6 +169,7 @@ def admin():
             min_date = df_presensi['tanggal'].min()
             max_date = df_presensi['tanggal'].max()
             selected_date = st.date_input("Pilih Tanggal", min_value=min_date, max_value=max_date, key="date_filter")
+            st.write(f"min_date: {min_date}, max_date: {max_date}")
 
             # Filter DataFrame berdasarkan pencarian dan tanggal
             filtered_df = df_presensi
