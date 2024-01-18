@@ -167,7 +167,7 @@ def admin():
             # Input untuk pencarian dan filter
             search_query = st.text_input("Cari Nama atau Kelas:")
             # Fetch the oldest date from the database
-            response = client.table('presensi').select('tanggal').order('tanggal', ascending=True).limit(1).execute()
+            response = client.table('presensi').select('tanggal').order('tanggal').limit(1).execute()
             oldest_date = response.data[0]['tanggal'].date() if response.data else datetime.date.today()
             
             # Fetch the newest date from the database
